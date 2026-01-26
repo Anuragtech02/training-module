@@ -16,6 +16,7 @@ export default function ElearningCourseDetailsLessonList({
   quiz,
   hasBoughtCourse,
   courseName,
+  courseId,
   refProp,
 }) {
   const score = true;
@@ -38,6 +39,7 @@ export default function ElearningCourseDetailsLessonList({
       <Quiz
         _questions={quiz}
         courseName={courseName}
+        courseId={courseId}
         score={score}
         hasBoughtCourse={hasBoughtCourse}
         finalQuiz
@@ -52,5 +54,6 @@ ElearningCourseDetailsLessonList.propTypes = {
   hasBoughtCourse: PropTypes.bool,
   quiz: PropTypes.any,
   courseName: PropTypes.any,
+  courseId: PropTypes.string,
   refProp: PropTypes.any,
 };

@@ -32,6 +32,7 @@ export default function ElearningCheckoutOrderSummary({
   loading,
   isDelete,
   setCouponDiscountone,
+  buttonLabel = 'Buy Now',
 }) {
   const [coupon, setCoupon] = useState('');
 
@@ -143,7 +144,7 @@ export default function ElearningCheckoutOrderSummary({
         type="submit"
         loading={loading}
       >
-        Buy Now
+        {buttonLabel}
       </LoadingButton>
     </Stack>
   );
@@ -159,6 +160,7 @@ ElearningCheckoutOrderSummary.propTypes = {
   total: PropTypes.number,
   isDelete: PropTypes.bool,
   setCouponDiscountone: PropTypes.any,
+  buttonLabel: PropTypes.string,
 };
 
 // ----------------------------------------------------------------------

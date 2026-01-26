@@ -37,6 +37,7 @@ export default function QuizHookForm(props) {
     questions,
     handleModalClose,
     courseName,
+    courseId,
     score,
     startTime,
     setPopupOpenOne,
@@ -78,7 +79,7 @@ export default function QuizHookForm(props) {
     setCurrentQuestionIndex((prevState) => prevState - 1);
   };
 
-  const capitalizeFirstLetter = (string) => string.replace(/\b\w/g, (char) => char.toUpperCase());
+  const capitalizeFirstLetter = (string) => string?.replace(/\b\w/g, (char) => char.toUpperCase()) || '';
 
   const goToNext = () => {
     if (currentQuestionIndex + 1 !== questions.length) {
@@ -113,7 +114,7 @@ export default function QuizHookForm(props) {
 
   console.log('UserData', UserData);
 
-  async function addScoreToStrapi(itemId) {
+  async function addScoreToStrapi() {
     const requestBody = {
       data: {
         username: UserData.username,
@@ -122,6 +123,9 @@ export default function QuizHookForm(props) {
         email: UserData.email,
         firstname: capitalizeFirstLetter(UserData?.firstname),
         lastname: capitalizeFirstLetter(UserData?.lastname),
+        user: UserData.id,
+        course: courseId,
+        totalQuestions: questions.length,
       },
     };
     try {
@@ -316,6 +320,7 @@ QuizHookForm.propTypes = {
   questions: PropTypes.array.isRequired,
   handleModalClose: PropTypes.func.isRequired,
   courseName: PropTypes.any,
+  courseId: PropTypes.string,
   score: PropTypes.bool,
   startTime: PropTypes.any,
   setPopupOpenOne: PropTypes.bool,

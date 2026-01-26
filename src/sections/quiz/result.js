@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import List from '@mui/material/List';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { areArraysEqual } from '@mui/base';
 import Divider from '@mui/material/Divider';
@@ -41,20 +42,21 @@ const Result = ({
   );
 
   const percentage = (correctAnswers / questions.length) * 100;
+  const isPassing = percentage >= 90;
   let message = '';
   let messageColor = '';
 
-  if (percentage === 100) {
-    message = 'Congratulations! You got all the answers correct!';
+  if (percentage >= 90) {
+    message = 'Congratulations! You passed the course! Your certificate has been issued.';
     messageColor = 'success.main';
   } else if (percentage >= 75) {
-    message = 'Great job! You performed well in the quiz.';
+    message = 'Good effort! You need 90% to pass and receive your certificate. Please try again.';
     messageColor = 'info.main';
   } else if (percentage >= 50) {
-    message = 'Not bad! You passed, but there is room for improvement.';
+    message = 'You need 90% to pass and receive your certificate. Review the material and try again.';
     messageColor = 'warning.main';
   } else {
-    message = 'Oops! You might want to review the material and try again.';
+    message = 'You need 90% to pass and receive your certificate. Please review the material and try again.';
     messageColor = 'error.main';
   }
 
@@ -82,6 +84,12 @@ const Result = ({
           <Typography variant="body1" color={messageColor} sx={{ mt: 2, mb: 3 }}>
             {message}
           </Typography>
+
+          {isPassing && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              Your certificate is valid for 1 year. You can view it in your account under Certificates.
+            </Alert>
+          )}
 
           <Box sx={{ p: 2 }}>
             <Box sx={{ display: 'flex' }} textAlign="center">
@@ -144,7 +152,7 @@ const Result = ({
             backgroundColor: 'background.default',
           }}
         >
-          {percentage >= 70 ? (
+          {isPassing ? (
             <Button href={paths.eLearning.account.vouchers} variant="contained">
               Certificates
             </Button>
@@ -159,10 +167,9 @@ const Result = ({
               </Button>
               <Button
                 onClick={handleModalClose}
-                // sx={{ bgcolor: '#FF774B', color: 'white', '&:hover': { bgcolor: '#FF5722' } }}\
                 variant="contained"
               >
-                close
+                Close
               </Button>
             </>
           )}
