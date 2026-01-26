@@ -14,9 +14,12 @@ export const coursesCertificatesFilter = (quizScore) => {
     }
   });
 
-  const completedCourses = Object.values(courseScores).filter(
-    (quizData) => (quizData.attributes.score / 10) * 100 >= 50
-  );
+  const completedCourses = Object.values(courseScores).filter((quizData) => {
+    const { score, totalQuestions } = quizData.attributes;
+    const total = totalQuestions || 10; // Fallback to 10 for older records
+    const percentage = (Number(score) / total) * 100;
+    return percentage >= 90;
+  });
 
   return completedCourses;
 };
