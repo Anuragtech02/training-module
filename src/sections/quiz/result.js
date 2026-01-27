@@ -41,22 +41,23 @@ const Result = ({
     [answers, questions]
   );
 
+  const passThreshold = Number(process.env.NEXT_PUBLIC_PASS_THRESHOLD) || 90;
   const percentage = (correctAnswers / questions.length) * 100;
-  const isPassing = percentage >= 90;
+  const isPassing = percentage >= passThreshold;
   let message = '';
   let messageColor = '';
 
-  if (percentage >= 90) {
+  if (percentage >= passThreshold) {
     message = 'Congratulations! You passed the course! Your certificate has been issued.';
     messageColor = 'success.main';
   } else if (percentage >= 75) {
-    message = 'Good effort! You need 90% to pass and receive your certificate. Please try again.';
+    message = `Good effort! You need ${passThreshold}% to pass and receive your certificate. Please try again.`;
     messageColor = 'info.main';
   } else if (percentage >= 50) {
-    message = 'You need 90% to pass and receive your certificate. Review the material and try again.';
+    message = `You need ${passThreshold}% to pass and receive your certificate. Review the material and try again.`;
     messageColor = 'warning.main';
   } else {
-    message = 'You need 90% to pass and receive your certificate. Please review the material and try again.';
+    message = `You need ${passThreshold}% to pass and receive your certificate. Please review the material and try again.`;
     messageColor = 'error.main';
   }
 

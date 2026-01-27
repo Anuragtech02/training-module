@@ -59,9 +59,11 @@ export default function ElearningCheckoutOrderSummary({
   };
 
   useEffect(() => {
-    getTaxAndCoupons();
+    if (total) {
+      getTaxAndCoupons();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [total]);
 
   const discountClick = async () => {
     const response = await axiosClient.get('/api/configuration?populate=*');

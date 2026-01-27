@@ -233,7 +233,7 @@ export default function QuizForm(props) {
             variant="outlined"
           />
           <DialogContentText color="red">
-            *To successfully finish the course, a minimum score of 90% is required.
+            *To successfully finish the course, a minimum score of {process.env.NEXT_PUBLIC_PASS_THRESHOLD || '90'}% is required.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
