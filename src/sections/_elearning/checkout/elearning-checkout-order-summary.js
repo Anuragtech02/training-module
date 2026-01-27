@@ -32,6 +32,7 @@ export default function ElearningCheckoutOrderSummary({
   loading,
   isDelete,
   setCouponDiscountone,
+  buttonLabel = 'Buy Now',
 }) {
   const [coupon, setCoupon] = useState('');
 
@@ -53,14 +54,16 @@ export default function ElearningCheckoutOrderSummary({
 
     const taxedAmountOne = (total * tax) / 100;
     setTaxedAmount(taxedAmountOne);
-    setTaxAmount(taxedAmountOne);
+    setTaxAmount?.(taxedAmountOne);
     setTotalAmount(taxedAmountOne + total);
   };
 
   useEffect(() => {
-    getTaxAndCoupons();
+    if (total) {
+      getTaxAndCoupons();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [total]);
 
   const discountClick = async () => {
     const response = await axiosClient.get('/api/configuration?populate=*');
@@ -72,7 +75,7 @@ export default function ElearningCheckoutOrderSummary({
       console.log(couponDiscountPercentage);
       setTotalAmount((prev) => prev - Math.round(totalAmount * (coupons.percentage / 100)));
       console.log(totalAmount);
-      setCouponDiscountone(coupons.percentage);
+      setCouponDiscountone?.(coupons.percentage);
       setCouponApply(true);
     } else {
       setCouponDiscountPercentage(0);
@@ -143,7 +146,7 @@ export default function ElearningCheckoutOrderSummary({
         type="submit"
         loading={loading}
       >
-        Buy Now
+        {buttonLabel}
       </LoadingButton>
     </Stack>
   );
@@ -159,6 +162,7 @@ ElearningCheckoutOrderSummary.propTypes = {
   total: PropTypes.number,
   isDelete: PropTypes.bool,
   setCouponDiscountone: PropTypes.any,
+  buttonLabel: PropTypes.string,
 };
 
 // ----------------------------------------------------------------------

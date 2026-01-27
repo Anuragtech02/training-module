@@ -73,7 +73,7 @@ export default function ElearningCourseView({ courseId }) {
           )}
 
           <Grid xs={12} md={7} lg={8}>
-            <ElearningCourseDetailsSummary refProp={myRef} course={data?.attributes} />
+            <ElearningCourseDetailsSummary refProp={myRef} course={data?.attributes} courseId={data?.id} />
           </Grid>
 
           <Grid xs={12} md={5} lg={4}>

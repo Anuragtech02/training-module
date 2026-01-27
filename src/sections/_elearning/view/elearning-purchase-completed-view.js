@@ -1,9 +1,7 @@
 'use client';
 
-import axios from 'axios';
+import { useEffect } from 'react';
 import { m } from 'framer-motion';
-// import { useEffect } from 'react';
-import { useQuery } from 'react-query';
 import { useSearchParams } from 'next/navigation';
 
 import Box from '@mui/material/Box';
@@ -15,11 +13,8 @@ import Typography from '@mui/material/Typography';
 import { paths } from 'src/routes/paths';
 import Iconify from 'src/components/iconify';
 import { useCartStore } from 'src/states/cart';
-// import { useBoolean } from 'src/hooks/use-boolean';
 import { RouterLink } from 'src/routes/components';
-import { axiosClient } from 'src/utils/axiosClient';
 import { useUserStore } from 'src/states/auth-store';
-// import { SplashScreen } from 'src/components/loading-screen';
 import { varBounce, MotionContainer } from 'src/components/animate';
 
 // ----------------------------------------------------------------------
@@ -28,35 +23,17 @@ export default function ElearningPurchaseCompletedView() {
   const { UserData } = useUserStore();
 
   const search = useSearchParams();
-  // const success = search.get('success');
   const username = search.get('username');
 
   const emptyCart = useCartStore((state) => state.emptyCart);
-  const cart = useCartStore((state) => state.cart);
 
-  const addUserToCourse = (itemId) => {
-    // const apiUrl = process.env.NEXT_PUBLIC_COURSES_URL; // Your Strapi base URL
-    // const contentType = 'courses'; // Replace with your actual content type
-
-    axiosClient
-      .put(`/api/courses/${itemId}`, {
-        data: {
-          users: {
-            connect: [UserData.id],
-          },
-        },
-      })
-      .then((res) => {
-        console.log('Array updated successfully ', res.data);
-      })
-      .then((res) => emptyCart())
-      .catch((err) => console.log(err));
-  };
-
-  useQuery({
-    queryKey: ['payment'],
-    queryFn: () => username === UserData.username && cart.forEach(({ id }) => addUserToCourse(id)),
-  });
+  // Clear cart on successful purchase
+  // Course enrollment is now handled by backend webhook
+  useEffect(() => {
+    if (username === UserData.username) {
+      emptyCart();
+    }
+  }, [username, UserData.username, emptyCart]);
 
   return (
     <Container

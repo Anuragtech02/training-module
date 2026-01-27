@@ -117,6 +117,7 @@ export default function ElearningReviewForm({ setReviewOpen }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_STRAPI_TOKEN}`,
         },
         body: JSON.stringify(requestBody),
       });

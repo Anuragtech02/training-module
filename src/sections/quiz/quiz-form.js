@@ -31,6 +31,7 @@ export default function QuizForm(props) {
     _questions,
     hasBoughtCourse,
     courseName,
+    courseId,
     score,
     finalQuiz,
     title,
@@ -232,7 +233,7 @@ export default function QuizForm(props) {
             variant="outlined"
           />
           <DialogContentText color="red">
-            *To successfully finish the course, a minimum score of 70% is required.
+            *To successfully finish the course, a minimum score of {process.env.NEXT_PUBLIC_PASS_THRESHOLD || '90'}% is required.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -265,6 +266,7 @@ export default function QuizForm(props) {
           setPopupOpenOne={setPopupOpen}
           questions={questions}
           courseName={courseName}
+          courseId={courseId}
           handleModalClose={handleModalClose}
           startTime={startTime}
           score={score}
@@ -279,6 +281,7 @@ QuizForm.propTypes = {
   _questions: PropTypes.array,
   hasBoughtCourse: PropTypes.bool,
   courseName: PropTypes.any,
+  courseId: PropTypes.string,
   score: PropTypes.bool,
   finalQuiz: PropTypes.bool,
   title: PropTypes.string,

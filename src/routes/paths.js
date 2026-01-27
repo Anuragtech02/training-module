@@ -48,6 +48,7 @@ export const paths = {
     purchaseCompleted: '/purchase-completed',
     wishlist: '/wishlist',
     myLearning: '/account/my-learning',
+    renewal: '/renewal',
     account: {
       root: `/account`,
       personal: `/account/personal`,

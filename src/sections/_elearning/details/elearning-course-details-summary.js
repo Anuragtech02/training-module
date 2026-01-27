@@ -13,7 +13,7 @@ import ElearningCourseDetailsUnitList from './elearning-course-details-unit-list
 
 // ----------------------------------------------------------------------
 
-export default function ElearningCourseDetailsSummary({ course, refProp }) {
+export default function ElearningCourseDetailsSummary({ course, courseId, refProp }) {
   const userData = useUserStore((state) => state.UserData);
 
   const { isLoggedIn } = userData;
@@ -29,6 +29,7 @@ export default function ElearningCourseDetailsSummary({ course, refProp }) {
         units={course.units?.data}
         quiz={course?.quiz}
         courseName={course}
+        courseId={courseId}
         // unitQuiz={course.units?.data.attributes.quiz}
         hasBoughtCourse={hasBoughtCourse}
       />
@@ -100,5 +101,6 @@ ElearningCourseDetailsSummary.propTypes = {
     WhatYouWillLearn: PropTypes.array,
     Skills: PropTypes.array,
   }),
+  courseId: PropTypes.string,
   refProp: PropTypes.any,
 };
