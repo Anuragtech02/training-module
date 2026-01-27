@@ -1,6 +1,7 @@
 'use client';
 
 import * as Yup from 'yup';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useQuery } from 'react-query';
 import { useForm } from 'react-hook-form';
@@ -16,6 +17,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
+import { useRouter } from 'src/routes/hooks';
 import FormProvider from 'src/components/hook-form';
 import { getCourseInfo } from 'src/queries/checkout';
 import { useUserStore } from 'src/states/auth-store';
@@ -27,17 +29,17 @@ import ElearningCheckoutPersonalDetails from '../checkout/elearning-checkout-per
 
 // ----------------------------------------------------------------------
 
-const stripePromise = loadStripe(
-  'pk_test_51O14wJSGKNDRcuJuUqGzWCeftvJOpycOZUjVgL5BoNzq82clRNztJYpNZw2mdqFtZrkRCCZVbIpSHSqYTIRpJe6t00WaGaXnpK'
-);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 // ----------------------------------------------------------------------
 
 export default function ElearningRenewalView() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const courseId = searchParams.get('course');
 
   const { UserData } = useUserStore();
+  const [error, setError] = useState('');
 
   const queryRes = useQuery({
     queryKey: ['course', courseId],
@@ -50,13 +52,11 @@ export default function ElearningRenewalView() {
   const _courses = queryData ? [queryData] : [];
 
   const cost = _courses?.map((course) => course?.attributes?.price).reduce((a, b) => a + b, 0);
-  const discountPercent = cost && 7;
   const taxPercent = cost && 18;
 
   const subTotal = cost;
-  const discount = cost && cost * (discountPercent / -16.17);
   const tax = cost && cost * (taxPercent / 100);
-  const total = cost && subTotal + discount + tax;
+  const total = cost;
 
   const RenewalCheckoutSchema = Yup.object().shape({
     userName: Yup.string(),
@@ -90,13 +90,16 @@ export default function ElearningRenewalView() {
   } = methods;
 
   const onSubmit = handleSubmit(async (data) => {
+    setError('');
     try {
-      makePayment(data);
-    } catch (error) {
-      console.error(error);
+      await makePayment(data);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Something went wrong. Please try again.');
     }
   });
 
+  // Check for valid course
   if (!courseId) {
     return (
       <Container sx={{ py: 10, textAlign: 'center' }}>
@@ -112,10 +115,36 @@ export default function ElearningRenewalView() {
 
   if (loading) return <SplashScreen />;
 
-  const userToken = localStorage.getItem('token');
+  // Check for authentication
+  const userToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+  if (!UserData?.id || !userToken) {
+    return (
+      <Container sx={{ py: 10, textAlign: 'center' }}>
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          Please Log In
+        </Typography>
+        <Typography sx={{ color: 'text.secondary', mb: 3 }}>
+          You need to be logged in to renew your certificate.
+        </Typography>
+        <Typography
+          component="a"
+          href={`/auth/login?redirect=/renewal?course=${courseId}`}
+          sx={{ color: 'primary.main', textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          Go to Login
+        </Typography>
+      </Container>
+    );
+  }
 
   async function makePayment(data) {
     const stripe = await stripePromise;
+
+    if (!stripe) {
+      throw new Error('Payment system is not available. Please try again later.');
+    }
+
     const requestBody = {
       username: UserData.username,
       email: UserData.email,
@@ -134,10 +163,23 @@ export default function ElearningRenewalView() {
       },
       body: JSON.stringify(requestBody),
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to create order. Please try again.');
+    }
+
     const session = await response.json();
-    await stripe.redirectToCheckout({
-      sessionId: session.id,
-    });
+
+    if (!session?.id) {
+      throw new Error('Invalid response from server. Please try again.');
+    }
+
+    const result = await stripe.redirectToCheckout({ sessionId: session.id });
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
   }
 
   return (
@@ -152,6 +194,12 @@ export default function ElearningRenewalView() {
         <Typography variant="h3" sx={{ mb: 2 }}>
           Certificate Renewal
         </Typography>
+
+{error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <Alert severity="warning" sx={{ mb: 4 }}>
           Your certificate for this course has expired or is about to expire. Re-enroll now to
@@ -174,7 +222,6 @@ export default function ElearningRenewalView() {
                 taxPercent={taxPercent}
                 total={total}
                 subtotal={subTotal}
-                discount={discount}
                 courses={_courses}
                 loading={isSubmitting}
                 buttonLabel="Re-enroll Now"
