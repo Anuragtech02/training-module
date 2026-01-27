@@ -17,7 +17,6 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
-import { useRouter } from 'src/routes/hooks';
 import FormProvider from 'src/components/hook-form';
 import { getCourseInfo } from 'src/queries/checkout';
 import { useUserStore } from 'src/states/auth-store';
@@ -34,7 +33,6 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 // ----------------------------------------------------------------------
 
 export default function ElearningRenewalView() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const courseId = searchParams.get('course');
 
@@ -55,7 +53,6 @@ export default function ElearningRenewalView() {
   const taxPercent = cost && 18;
 
   const subTotal = cost;
-  const tax = cost && cost * (taxPercent / 100);
   const total = cost;
 
   const RenewalCheckoutSchema = Yup.object().shape({
@@ -129,7 +126,7 @@ export default function ElearningRenewalView() {
         </Typography>
         <Typography
           component="a"
-          href={`/auth/login?redirect=/renewal?course=${courseId}`}
+          href={`/auth/login?redirect=${encodeURIComponent(`/renewal?course=${courseId}`)}`}
           sx={{ color: 'primary.main', textDecoration: 'underline', cursor: 'pointer' }}
         >
           Go to Login
@@ -195,7 +192,7 @@ export default function ElearningRenewalView() {
           Certificate Renewal
         </Typography>
 
-{error && (
+        {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>

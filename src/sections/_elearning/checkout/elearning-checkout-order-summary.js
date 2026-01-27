@@ -54,7 +54,7 @@ export default function ElearningCheckoutOrderSummary({
 
     const taxedAmountOne = (total * tax) / 100;
     setTaxedAmount(taxedAmountOne);
-    setTaxAmount(taxedAmountOne);
+    setTaxAmount?.(taxedAmountOne);
     setTotalAmount(taxedAmountOne + total);
   };
 
@@ -73,7 +73,7 @@ export default function ElearningCheckoutOrderSummary({
       console.log(couponDiscountPercentage);
       setTotalAmount((prev) => prev - Math.round(totalAmount * (coupons.percentage / 100)));
       console.log(totalAmount);
-      setCouponDiscountone(coupons.percentage);
+      setCouponDiscountone?.(coupons.percentage);
       setCouponApply(true);
     } else {
       setCouponDiscountPercentage(0);
