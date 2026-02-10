@@ -1,24 +1,112 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-// import { differenceInCalendarDays } from 'date-fns';
 
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import Image from 'src/components/image';
-// import Iconify from 'src/components/iconify';
+import Iconify from 'src/components/iconify';
 import ElearningCertificateDialog from 'src/sections/certificate/elearning-certificate-dialog';
-// import { fDate } from 'src/utils/format-time';
-// import TextMaxLine from 'src/components/text-max-line';
-// import Certificate from 'src/sections/certificate/certificate';
 
 // ----------------------------------------------------------------------
 
-export default function EcommerceAccountVoucherItem({ certificateData, userData }) {
-  // const dayLeft = differenceInCalendarDays(voucher.dueOn, new Date());
+const certificateImages = [
+  {
+    courseTitle: '8 Hours Initial Administrator Training Program',
+    image: '/assets/images/course/basics2.png',
+  },
+  {
+    courseTitle: '16 Hours for New Administrators and Alternates',
+    image: '/assets/images/course/basicsandbeyond2.png',
+  },
+  {
+    courseTitle: '12 Hours for existing Administrators and Alternates',
+    image: '/assets/images/course/advanced2.png',
+  },
+];
 
+// Helper to get certificate data whether from user-certificate or quiz-score
+function getCertificateInfo(certificateData, isUserCertificate) {
+  const attrs = certificateData?.attributes || {};
+
+  if (isUserCertificate) {
+    // Data from user-certificate API (populated with course and quizScore)
+    const course = attrs.course?.data?.attributes || {};
+    const quizScore = attrs.quizScore?.data?.attributes || {};
+    return {
+      courseTitle: course.title || 'Unknown Course',
+      score: quizScore.score || 'N/A',
+      totalQuestions: quizScore.totalQuestions || 10,
+      firstname: quizScore.firstname,
+      lastname: quizScore.lastname,
+      issuedDate: attrs.issuedDate,
+      expiryDate: attrs.expiryDate,
+      status: attrs.status,
+    };
+  }
+
+  // Legacy: Data from quiz-score API
+  return {
+    courseTitle: attrs.courseTitle || 'Unknown Course',
+    score: attrs.score || 'N/A',
+    totalQuestions: attrs.totalQuestions || 10,
+    firstname: attrs.firstname,
+    lastname: attrs.lastname,
+    issuedDate: null,
+    expiryDate: null,
+    status: 'active',
+  };
+}
+
+function getStatusChip(status, expiryDate) {
+  if (status === 'expired') {
+    return (
+      <Chip
+        size="small"
+        label="Expired"
+        color="error"
+        icon={<Iconify icon="carbon:warning" width={16} />}
+        sx={{ mb: 1 }}
+      />
+    );
+  }
+
+  if (status === 'expiring_soon') {
+    return (
+      <Chip
+        size="small"
+        label="Expiring Soon"
+        color="warning"
+        icon={<Iconify icon="carbon:time" width={16} />}
+        sx={{ mb: 1 }}
+      />
+    );
+  }
+
+  if (expiryDate) {
+    return (
+      <Chip
+        size="small"
+        label={`Valid until ${expiryDate}`}
+        color="success"
+        variant="outlined"
+        sx={{ mb: 1 }}
+      />
+    );
+  }
+
+  return null;
+}
+
+export default function EcommerceAccountVoucherItem({
+  certificateData,
+  userData,
+  isUserCertificate = false,
+  isExpired = false,
+}) {
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -29,26 +117,15 @@ export default function EcommerceAccountVoucherItem({ certificateData, userData 
     setOpen(false);
   };
 
-  const certificateImages = [
-    {
-      courseTitle: '8 Hours Initial Administrator Training Program',
-      image: '/assets/images/course/basics2.png',
-    },
-    {
-      courseTitle: '16 Hours for New Administrators and Alternates',
-      image: '/assets/images/course/basicsandbeyond2.png',
-      // image: '/assets/images/course/basic.png',
-    },
-    {
-      courseTitle: '12 Hours for existing Administrators and Alternates',
-      image: '/assets/images/course/advanced2.png',
-      // image: '/assets/images/course/basic.png',
-    },
-  ];
+  const certInfo = getCertificateInfo(certificateData, isUserCertificate);
 
   const imageUrl = certificateImages
-    .filter((data) => data.courseTitle === certificateData.attributes.courseTitle)
+    .filter((data) => data.courseTitle === certInfo.courseTitle)
     .at(0)?.image;
+
+  const hasName =
+    (certInfo.firstname && certInfo.lastname) ||
+    (userData?.firstname && userData?.lastname);
 
   return (
     <Stack
@@ -56,7 +133,8 @@ export default function EcommerceAccountVoucherItem({ certificateData, userData 
       sx={{
         borderRadius: 1,
         overflow: 'hidden',
-        border: (theme) => `solid 1px #FF9470`,
+        border: (theme) => `solid 1px ${isExpired ? '#bdbdbd' : '#FF9470'}`,
+        opacity: isExpired ? 0.7 : 1,
       }}
     >
       <Stack
@@ -65,9 +143,8 @@ export default function EcommerceAccountVoucherItem({ certificateData, userData 
         justifyContent="center"
         sx={{
           width: 120,
-          height: 120,
+          height: 140,
           flexShrink: 0,
-          // borderRight: (theme) => `dashed 1px #FF9470`,
         }}
       >
         <Box sx={{ flexShrink: { sm: 0 }, pt: 1 }}>
@@ -78,64 +155,34 @@ export default function EcommerceAccountVoucherItem({ certificateData, userData 
               height: 1,
               objectFit: 'cover',
               width: 100,
-              // ...(vertical && {
-              //   width: { sm: 1 },
-              // }),
+              filter: isExpired ? 'grayscale(50%)' : 'none',
             }}
           />
         </Box>
-
-        {/* <TextMaxLine variant="overline" line={1}> */}
-        {/* {voucher.label} */}
-        {/* {voucher.attributes.courseTitle} */}
-        {/* </TextMaxLine> */}
       </Stack>
 
-      <Stack sx={{ pl: 2.5, pr: 2.5, pb: 1, pt: 1 }}>
-        <Typography variant="h6" sx={{ color: '#FF774C' }}>
-          {certificateData?.attributes.courseTitle}
+      <Stack sx={{ pl: 2.5, pr: 2.5, pb: 1, pt: 1, flex: 1 }}>
+        <Typography variant="h6" sx={{ color: isExpired ? 'text.secondary' : '#FF774C' }}>
+          {certInfo.courseTitle}
         </Typography>
-        {/* <Typography variant="h7" sx={{ mt: 0.5, mb: 0.5 }}>
-          Username : {voucher?.attributes.username}
-        </Typography> */}
-        {/* <Typography variant="h7" sx={{ mb: 1 }}>
-          {voucher?.attributes.email}
-        </Typography> */}
 
-        {/* <Stack
-          direction="row"
-          alignItems="center"
-          sx={{
-            typography: 'caption',
-            color: 'text.disabled',
-            ...(dayLeft <= 1 && {
-              color: 'error.main',
-            }),
-          }}
-        > */}
-        {/* <Iconify icon="carbon:time" width={16} sx={{ mr: 1 }} /> */}
-        <Typography variant="h7" sx={{ mb: 1 }}>
-          Score : {certificateData?.attributes.score}/10
+        {getStatusChip(certInfo.status, certInfo.expiryDate)}
+
+        <Typography variant="body2" sx={{ mb: 1 }}>
+          Score: {certInfo.score}/{certInfo.totalQuestions}
         </Typography>
+
         <Button
-          color="primary"
+          color={isExpired ? 'inherit' : 'primary'}
           size="large"
           variant="contained"
           onClick={() => handleClickOpen()}
-          disabled={
-            !(
-              (certificateData?.attributes?.firstname && certificateData?.attributes?.lastname) ||
-              (userData?.firstname && userData?.lastname)
-            )
-          }
+          disabled={!hasName}
         >
           View
         </Button>
 
-        {!(
-          (certificateData?.attributes?.firstname && certificateData?.attributes?.lastname) ||
-          (userData?.firstname && userData?.lastname)
-        ) && (
+        {!hasName && (
           <Typography variant="caption" sx={{ mt: 1, color: 'error.main', fontStyle: 'italic' }}>
             Please update your profile with your first and last name to view the certificate.
           </Typography>
@@ -146,32 +193,16 @@ export default function EcommerceAccountVoucherItem({ certificateData, userData 
           handleClose={handleClose}
           certificateData={certificateData}
           userData={userData}
+          isUserCertificate={isUserCertificate}
         />
       </Stack>
     </Stack>
-    // </Stack>
   );
 }
 
 EcommerceAccountVoucherItem.propTypes = {
   certificateData: PropTypes.object,
   userData: PropTypes.object,
+  isUserCertificate: PropTypes.bool,
+  isExpired: PropTypes.bool,
 };
-
-// ----------------------------------------------------------------------
-
-// function getIcon(type) {
-//   let icon;
-
-//   switch (type) {
-//     case 'shipping':
-//       icon = <Iconify icon="carbon:delivery" width={32} />;
-//       break;
-//     case 'category':
-//       icon = <Iconify icon="carbon:cut-out" width={32} />;
-//       break;
-//     default:
-//       icon = <Iconify icon="carbon:star" width={32} />;
-//   }
-//   return icon;
-// }
