@@ -24,6 +24,85 @@ import EcommerceAccountVoucherItem from '../account/ecommerce-account-voucher-it
 
 // ----------------------------------------------------------------------
 
+function EmptyState() {
+  return (
+    <Box>
+      <Stack
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          position: 'relative',
+          ml: { md: -2 },
+          mt: { xs: 12, md: 4 },
+        }}
+      >
+        <Image
+          alt="Empty State My Learning"
+          src="/assets/images/empty-states/no-wishlist.png"
+          sx={{
+            height: { xs: 122, md: 182 },
+            width: { xs: 160, md: 220 },
+            objectFit: 'cover',
+          }}
+        />
+
+        <Link component={RouterLink} href={paths.eLearning.courses} sx={{ pt: 10 }}>
+          <Button
+            color="secondary"
+            size="large"
+            variant="contained"
+            startIcon={<Iconify icon="carbon:chevron-left" />}
+          >
+            Start Learning
+          </Button>
+        </Link>
+      </Stack>
+    </Box>
+  );
+}
+
+function renderActiveCertificatesContent(activeCertificates, hasAnyCertificates, userData) {
+  if (activeCertificates.length > 0) {
+    return (
+      <>
+        <Typography variant="subtitle1" sx={{ mb: 2, color: 'success.main' }}>
+          Active Certificates ({activeCertificates.length})
+        </Typography>
+        {activeCertificates.map((cert) => (
+          <Box
+            key={cert.id}
+            gap={3}
+            display="grid"
+            gridTemplateColumns={{
+              xs: 'repeat(1, 1fr)',
+              md: 'repeat(2, 1fr)',
+            }}
+            sx={{ mb: 2 }}
+          >
+            <EcommerceAccountVoucherItem
+              certificateData={cert}
+              userData={userData}
+              isUserCertificate
+            />
+          </Box>
+        ))}
+      </>
+    );
+  }
+
+  if (hasAnyCertificates) {
+    return (
+      <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
+        No active certificates. Check expired certificates below to renew.
+      </Typography>
+    );
+  }
+
+  return <EmptyState />;
+}
+
 export default function EcommerceAccountVouchersView() {
   const userData = useUserStore((state) => state.UserData);
 
@@ -66,72 +145,7 @@ export default function EcommerceAccountVouchersView() {
 
       {/* Active Certificates */}
       <Box>
-        {activeCertificates.length > 0 ? (
-          <>
-            <Typography variant="subtitle1" sx={{ mb: 2, color: 'success.main' }}>
-              Active Certificates ({activeCertificates.length})
-            </Typography>
-            {activeCertificates.map((cert) => (
-              <Box
-                key={cert.id}
-                gap={3}
-                display="grid"
-                gridTemplateColumns={{
-                  xs: 'repeat(1, 1fr)',
-                  md: 'repeat(2, 1fr)',
-                }}
-                sx={{ mb: 2 }}
-              >
-                <EcommerceAccountVoucherItem
-                  certificateData={cert}
-                  userData={userData}
-                  isUserCertificate
-                />
-              </Box>
-            ))}
-          </>
-        ) : hasAnyCertificates ? (
-          // Has expired certificates but no active ones
-          <Typography variant="body1" sx={{ color: 'text.secondary', mb: 2 }}>
-            No active certificates. Check expired certificates below to renew.
-          </Typography>
-        ) : (
-          // No certificates at all
-          <Box>
-            <Stack
-              sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-                position: 'relative',
-                ml: { md: -2 },
-                mt: { xs: 12, md: 4 },
-              }}
-            >
-              <Image
-                alt="Empty State My Learning"
-                src="/assets/images/empty-states/no-wishlist.png"
-                sx={{
-                  height: { xs: 122, md: 182 },
-                  width: { xs: 160, md: 220 },
-                  objectFit: 'cover',
-                }}
-              />
-
-              <Link component={RouterLink} href={paths.eLearning.courses} sx={{ pt: 10 }}>
-                <Button
-                  color="secondary"
-                  size="large"
-                  variant="contained"
-                  startIcon={<Iconify icon="carbon:chevron-left" />}
-                >
-                  Start Learning
-                </Button>
-              </Link>
-            </Stack>
-          </Box>
-        )}
+        {renderActiveCertificatesContent(activeCertificates, hasAnyCertificates, userData)}
       </Box>
 
       {/* Expired Certificates Section */}
