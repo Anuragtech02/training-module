@@ -1,40 +1,19 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { toast, ToastContainer } from 'react-toastify';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import Modal from '@mui/material/Modal';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
-import LoadingButton from '@mui/lab/LoadingButton';
 
-import { paths } from 'src/routes/paths';
 import Iconify from 'src/components/iconify';
 import { useCartStore } from 'src/states/cart';
-import { RouterLink } from 'src/routes/components';
 import { fCurrency } from 'src/utils/format-number';
 import { useUserStore } from 'src/states/auth-store';
 import { useWishlistStore } from 'src/states/wishlist';
 import ElearningReviewForm from 'src/sections/_elearning/contact/elearning-review-form';
-import FormProvider, {
-  RHFSelect,
-  RHFSwitch,
-  RHFSlider,
-  RHFCheckbox,
-  RHFTextField,
-  RHFRadioGroup,
-  RHFMultiSelect,
-  RHFAutocomplete,
-  RHFMultiCheckbox,
-} from 'src/components/hook-form';
-
-import { FormSchema } from './reviewschema';
 
 // ----------------------------------------------------------------------
 
@@ -137,35 +116,37 @@ export default function ElearningCourseDetailsInfo({ course }) {
         )} */}
 
         {!hasBoughtCourse ? (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-around',
-              alignItems: 'center',
-            }}
-          >
-            <Button
-              variant={isCourseInWishlist ? 'outlined' : 'contained'}
-              size="large"
-              color="inherit"
-              sx={{ width: '20%', marginRight: 1 }}
-              onClick={() =>
-                isCourseInWishlist ? addToWishlist(course) : removeFromWishlist(course)
-              }
+          <>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-around',
+                alignItems: 'center',
+              }}
             >
-              <Iconify icon={wishlistIcon} color="red" />
-            </Button>
+              <Button
+                variant={isCourseInWishlist ? 'outlined' : 'contained'}
+                size="large"
+                color="inherit"
+                sx={{ width: '20%', marginRight: 1 }}
+                onClick={() =>
+                  isCourseInWishlist ? addToWishlist(course) : removeFromWishlist(course)
+                }
+              >
+                <Iconify icon={wishlistIcon} color="red" />
+              </Button>
 
-            <Button
-              variant={isCourseInCart ? 'contained' : 'outlined'}
-              size="large"
-              color="secondary"
-              sx={{ width: '80%' }}
-              onClick={() => (isCourseInCart ? addToCart(course) : removeFromCart(course))}
-            >
-              {isCourseInCart ? 'Add to cart' : 'Remove from cart'}
-            </Button>
-          </Box>
+              <Button
+                variant={isCourseInCart ? 'contained' : 'outlined'}
+                size="large"
+                color="secondary"
+                sx={{ width: '80%' }}
+                onClick={() => (isCourseInCart ? addToCart(course) : removeFromCart(course))}
+              >
+                {isCourseInCart ? 'Add to cart' : 'Remove from cart'}
+              </Button>
+            </Box>
+          </>
         ) : (
           <Box
             sx={{

@@ -19,23 +19,52 @@ import Certificate from 'src/sections/certificate/certificate';
 
 // ----------------------------------------------------------------------
 
-export default function ElearningCertificateDialog({ open, handleClose, certificateData,userData }) {
+// Helper to normalize certificate data from different sources
+function normalizeCertificateData(certificateData, isUserCertificate, userData) {
+  const attrs = certificateData?.attributes || {};
+
+  if (isUserCertificate) {
+    // Data from user-certificate API - use issuedDate as the certificate date
+    const course = attrs.course?.data?.attributes || {};
+    const quizScore = attrs.quizScore?.data?.attributes || {};
+    return {
+      attributes: {
+        courseTitle: course.title || 'Unknown Course',
+        firstname: quizScore.firstname || userData?.firstname,
+        lastname: quizScore.lastname || userData?.lastname,
+        username: quizScore.username || userData?.username,
+        issuedDate: attrs.issuedDate,
+      },
+    };
+  }
+
+  // Legacy: Return as-is for quiz-score data
+  return certificateData;
+}
+
+export default function ElearningCertificateDialog({
+  open,
+  handleClose,
+  certificateData,
+  userData,
+  isUserCertificate = false,
+}) {
   const targetRef = useRef();
-  // const { data: certificateNames } = useQuery({
-  //   queryKey: ['certificateNames'],
-  //   queryFn: getCertificateData,
-  // });
 
   const { data: certificateNames } = useQuery('certificateNames', getCertificateData);
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const normalizedData = normalizeCertificateData(certificateData, isUserCertificate, userData);
+
   const handleGeneratePDF = async () => {
     try {
       setIsLoading(true);
 
+      const filename = `${normalizedData?.attributes?.username || userData?.username || 'User'}_${normalizedData?.attributes?.courseTitle || 'Certificate'}_Certificate.pdf`;
+
       await generatePDF(targetRef, {
-        filename: `${certificateData?.attributes.username}_${certificateData?.attributes.courseTitle}_Certificate.pdf`,
+        filename,
         method: 'download',
         resolution: Resolution.HIGH,
         format: 'letter',
@@ -100,7 +129,7 @@ export default function ElearningCertificateDialog({ open, handleClose, certific
           <Stack ref={targetRef}>
             {certificateNames && (
               <Certificate
-                certificateData={certificateData}
+                certificateData={normalizedData}
                 certificateNames={certificateNames.data.certificates.data[0].attributes.certificate}
                 userData={userData}
               />
@@ -116,5 +145,6 @@ ElearningCertificateDialog.propTypes = {
   open: PropTypes.bool,
   handleClose: PropTypes.func,
   certificateData: PropTypes.object,
-    userData: PropTypes.object
+  userData: PropTypes.object,
+  isUserCertificate: PropTypes.bool,
 };
