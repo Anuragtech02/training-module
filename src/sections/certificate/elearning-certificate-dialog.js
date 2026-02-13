@@ -24,7 +24,7 @@ function normalizeCertificateData(certificateData, isUserCertificate, userData) 
   const attrs = certificateData?.attributes || {};
 
   if (isUserCertificate) {
-    // Data from user-certificate API
+    // Data from user-certificate API - use issuedDate as the certificate date
     const course = attrs.course?.data?.attributes || {};
     const quizScore = attrs.quizScore?.data?.attributes || {};
     return {
@@ -33,8 +33,7 @@ function normalizeCertificateData(certificateData, isUserCertificate, userData) 
         firstname: quizScore.firstname || userData?.firstname,
         lastname: quizScore.lastname || userData?.lastname,
         username: quizScore.username || userData?.username,
-        createdAt: attrs.issuedDate,
-        updatedAt: attrs.issuedDate,
+        issuedDate: attrs.issuedDate,
       },
     };
   }

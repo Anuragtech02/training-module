@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 
 const Certificate = ({ certificateData, certificateNames, userData }) => {
-  const formattedDate = certificateData?.attributes.createdAt
+  // Use updatedAt for legacy quiz-scores (renewal date), createdAt is set for user-certificates
+  const formattedDate = certificateData?.attributes?.createdAt
     ? new Date(certificateData.attributes.updatedAt).toLocaleDateString('en-US', {
         month: '2-digit',
         day: '2-digit',

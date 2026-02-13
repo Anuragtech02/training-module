@@ -115,6 +115,11 @@ export default function QuizHookForm(props) {
   console.log('UserData', UserData);
 
   async function addScoreToStrapi() {
+    // Ensure courseId is a number for Strapi relation
+    const courseIdNum = courseId ? parseInt(courseId, 10) : null;
+
+    console.log('addScoreToStrapi - courseId:', courseId, 'parsed:', courseIdNum);
+
     const requestBody = {
       data: {
         username: UserData.username,
@@ -124,11 +129,12 @@ export default function QuizHookForm(props) {
         firstname: capitalizeFirstLetter(UserData?.firstname),
         lastname: capitalizeFirstLetter(UserData?.lastname),
         user: UserData.id,
-        course: courseId,
+        course: courseIdNum,
         totalQuestions: questions.length,
       },
     };
     try {
+      console.log('Submitting quiz score with data:', JSON.stringify(requestBody, null, 2));
       const response = await axiosClient.post('/api/quiz-scores', requestBody, {
         headers: {
           'Content-Type': 'application/json',
