@@ -14,6 +14,7 @@ import ProgressBar from 'src/components/progress-bar';
 import MotionLazy from 'src/components/animate/motion-lazy';
 import { ReactQueryProvider } from 'src/utils/ReactQueryProvider';
 import { SettingsDrawer, SettingsProvider } from 'src/components/settings';
+import { ChatWidget } from 'src/components/chat-widget';
 
 // ----------------------------------------------------------------------
 
@@ -69,6 +70,7 @@ export default function RootLayout({ children }) {
                   <SettingsDrawer />
                   {children}
                   <ToastContainer />
+                  <ChatWidget />
                 </MotionLazy>
               </ThemeProvider>
             </SettingsProvider>
