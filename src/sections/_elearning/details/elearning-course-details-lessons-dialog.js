@@ -87,7 +87,8 @@ export default function ElearningCourseDetailsLessonsDialog({
   // const reset = useUserProgress((state) => state.reset);
   // console.log({ userLessons });
 
-  const score = true;
+  const scoreFinalQuiz = true; // Only final quiz creates records
+  const scoreUnitQuiz = false; // Unit quizzes don't create records
 
   const { data: lessonData, isLoading } = useQuery({
     queryKey: ['unit', searchParams.get('unit'), searchParams.get('lesson')],
@@ -465,7 +466,7 @@ export default function ElearningCourseDetailsLessonsDialog({
             userLessonData={userLessonData}
             _questions={unit?.attributes?.quiz}
             courseName={courseTitle}
-            score={score}
+            score={scoreUnitQuiz}
             hasBoughtCourse={hasBoughtCourse}
             title={hasUnit ? 'Attempted. Click To Retry' : 'Start Test'}
           />
@@ -507,7 +508,8 @@ export default function ElearningCourseDetailsLessonsDialog({
       <Quiz
         _questions={courseQuiz}
         courseName={courseTitle}
-        score={score}
+        score={scoreFinalQuiz}
+        courseId={params.id}
         hasBoughtCourse={hasBoughtCourse}
         finalQuiz
         title="Final Test"
